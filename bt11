@@ -1,0 +1,48 @@
+import pandas as pd #bt11
+import numpy as np
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import train_test_split
+
+# 1. Giả lập dữ liệu (Data Simulation)
+# Giả sử ta có dữ liệu của 1000 thời điểm khác nhau
+data = {
+    'hour': np.random.randint(0, 24, 1000),       # Giờ: 0-23h
+    'day_of_week': np.random.randint(0, 7, 1000), # Thứ: 0-6 (0 là Thứ 2)
+    'district_id': np.random.randint(1, 11, 1000),# Mã quận: 1-10
+}
+
+df = pd.DataFrame(data)
+
+# Tạo mục tiêu (Target): Nhu cầu thực tế (có tính quy luật)
+# Nhu cầu tăng cao vào giờ cao điểm (8h, 17h) và cuối tuần
+df['demand'] = (
+    (df['hour'].isin([8, 9, 17, 18, 19]) * 50) +  # Giờ cao điểm +50 đơn
+    (df['day_of_week'] >= 5 * 20) +               # Cuối tuần +20 đơn
+    np.random.randint(0, 30, 1000)                # Nhiễu ngẫu nhiên
+)
+
+# 2. Xây dựng mô hình AI
+X = df[['hour', 'day_of_week', 'district_id']]
+y = df['demand']
+
+# Chia dữ liệu để huấn luyện và kiểm tra
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Sử dụng thuật toán Random Forest (Rừng ngẫu nhiên) - Rất hiệu quả cho quản trị
+model = RandomForestRegressor(n_estimators=100)
+model.fit(X_train, y_train)
+
+# 3. Dự báo thử cho một tình huống cụ thể
+# Ví dụ: Dự báo nhu cầu tại Quận 1, lúc 18h chiều (Giờ cao điểm), ngày Thứ 7 (day=5)
+test_scenario = [[18, 5, 1]] 
+prediction = model.predict(test_scenario)
+
+print(f"--- KẾT QUẢ DỰ BÁO NHU CẦU ---")
+print(f"Thời gian: 18:00 | Thứ: 7 | Khu vực: Quận 1")
+print(f"Dự báo số lượng đơn hàng: {int(prediction[0])} đơn")
+
+# 4. Phân tích sự khác biệt (Insight cho Quản trị)
+importance = model.feature_importances_
+print(f"\nMức độ ảnh hưởng của các yếu tố:")
+for i, feat in enumerate(['Giờ', 'Thứ', 'Quận']):
+    print(f"- {feat}: {importance[i]*100:.2f}%")
