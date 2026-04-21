@@ -1,0 +1,46 @@
+import folium #bt13
+from folium import plugins
+
+
+m = folium.Map(location=[10.7769, 106.7009], zoom_start=13, tiles='OpenStreetMap')
+
+
+layer_points = folium.FeatureGroup(name='Điểm: Kho hàng & Cửa hàng')
+layer_regions = folium.FeatureGroup(name='Vùng: Phạm vi phục vụ')
+layer_routes = folium.FeatureGroup(name='Tuyến: Lộ trình giao hàng')
+
+
+folium.Marker([10.773, 106.698], popup='Chợ Bến Thành (Điểm nhận)', icon=folium.Icon(color='red')).add_to(layer_points)
+folium.Marker([10.761, 106.668], popup='Cơ sở UEH (Kho trung tâm)', icon=folium.Icon(color='blue')).add_to(layer_points)
+
+
+folium.Circle(
+    radius=2000,
+    location=[10.761, 106.668],
+    color='crimson',
+    fill=True,
+    fill_opacity=0.2,
+    popup='Vùng ưu tiên giao hàng'
+).add_to(layer_regions)
+
+
+folium.PolyLine(
+    locations=[[10.761, 106.668], [10.773, 106.698]],
+    color='green',
+    weight=5,
+    opacity=0.8,
+    tooltip='Tuyến đường tối ưu xe số 01'
+).add_to(layer_routes)
+
+
+layer_points.add_to(m)
+layer_regions.add_to(m)
+layer_routes.add_to(m)
+folium.LayerControl().add_to(m)
+
+plugins.Fullscreen().add_to(m) # Chế độ toàn màn hình
+plugins.MeasureControl(primary_length_unit='kilometers').add_to(m) # Công cụ đo khoảng cách
+
+
+m
+print("Dashboard đã được tạo thành công! Hãy mở file 'dashboard_ai_ueh.html' để xem.")
