@@ -1,0 +1,33 @@
+import folium #bt8
+from geopy.distance import geodesic
+
+# Tọa độ mẫu (Khách hàng và Tài xế)
+customers = [(10.762, 106.660), (10.773, 106.693)]
+drivers = [(10.759, 106.675), (10.780, 106.680), (10.770, 106.700)]
+
+m = folium.Map(location=[10.765, 106.670], zoom_start=14)
+used_drivers = set()
+
+# Thuật toán Heuristic đơn giản: Ai gần nhất thì lấy
+for c_pos in customers:
+    folium.Marker(c_pos, icon=folium.Icon(color='red', icon='user')).add_to(m)
+
+    # Tìm tài xế gần nhất chưa được gán
+    best_driver = None
+    min_dist = float('inf')
+
+    for i, d_pos in enumerate(drivers):
+        if i not in used_drivers:
+            dist = geodesic(c_pos, d_pos).km
+            if dist < min_dist:
+                min_dist = dist
+                best_driver = i
+
+    # Nếu tìm thấy tài xế, thực hiện ghép cặp (nối đường thẳng)
+    if best_driver is not None:
+        used_drivers.add(best_driver)
+        d_pos = drivers[best_driver]
+        folium.Marker(d_pos, icon=folium.Icon(color='blue', icon='car')).add_to(m)
+        folium.PolyLine([c_pos, d_pos], color="green").add_to(m)
+
+m
