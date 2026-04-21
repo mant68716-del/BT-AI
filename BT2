@@ -1,0 +1,42 @@
+from geopy.geocoders import Nominatim #bt2
+from geopy.distance import geodesic
+import folium
+
+
+geolocator = Nominatim(user_agent="geo_exercise")
+addresses = [
+    "Dinh Độc Lập, TP.HCM", "Nhà thờ Đức Bà, TP.HCM", "Chợ Bến Thành, TP.HCM",
+    "Landmark 81, TP.HCM", "Bảo tàng Chứng tích Chiến tranh, TP.HCM",
+    "Thảo Cầm Viên, TP.HCM", "Bitexco Financial Tower, TP.HCM",
+    "Hồ Con Rùa, TP.HCM", "Phố đi bộ Nguyễn Huệ, TP.HCM", "Cầu Ánh Sao, TP.HCM"
+]
+
+center_address = "86 Lê Thánh Tôn, Bến Nghé, Quận 1, Thành phố Hồ Chí Minh"
+center_loc = geolocator.geocode(center_address)
+
+
+if center_loc is None:
+    print(f"Cảnh báo: Không tìm thấy tọa độ cho địa chỉ '{center_address}'. Sử dụng tọa độ mặc định (10.7769, 106.7009).")
+    center_coords = (10.7769, 106.7009) # Tọa độ mặc định (Quận 1, TP.HCM)
+else:
+    center_coords = (center_loc.latitude, center_loc.longitude)
+
+m = folium.Map(location=center_coords, zoom_start=14)
+folium.Marker(center_coords, popup="Trung tâm", icon=folium.Icon(color='red')).add_to(m)
+
+for addr in addresses:
+    location = geolocator.geocode(addr)
+    if location:
+        point_coords = (location.latitude, location.longitude)
+        # Tính khoảng cách (km)
+        dist = geodesic(center_coords, point_coords).kilometers
+
+        # Thêm Marker và đường nối
+        folium.Marker(
+            point_coords,
+            popup=f"{addr}<br>Cách tâm: {dist:.2f} km"
+        ).add_to(m)
+
+        folium.PolyLine([center_coords, point_coords], color="blue", weight=2, opacity=0.5).add_to(m)
+
+m
