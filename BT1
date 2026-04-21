@@ -1,0 +1,14 @@
+import folium # bt1
+m=folium.Map(location=[10.7831, 106.6947],zoom_start=15)
+folium.Marker(location=[10.7831, 106.6947],popup="UEH",icon=folium.Icon(color="green")).add_to(m)
+
+locations=[
+    ("Bệnh viện Nhi Đồng 2", [10.7828, 106.7003], "Bệnh viện chuyên khoa nhi tuyến đầu."),
+    ("Diamond Plaza", [10.7816, 106.6980], "Trung tâm thương mại và văn phòng."),
+    ("Nhà thờ Đức Bà", [10.7798, 106.6990], "Địa điểm du lịch và tôn giáo nổi tiếng."),
+    ("Dinh Độc Lập", [10.7770, 106.6954], "Di tích lịch sử quốc gia đặc biệt."),
+    ("Bưu điện Thành phố", [10.7799, 106.6999], "Kiến trúc cổ điển, điểm đến du lịch.")
+]
+for name, loc, description in locations:
+  folium.Marker(loc, popup=f"{name}: {description}", icon=folium.Icon(color="blue")).add_to(m)
+m
