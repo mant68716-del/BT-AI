@@ -1,0 +1,49 @@
+import pandas as pd #bt9
+import numpy as np
+from sklearn.cluster import KMeans
+import folium
+
+# 1. Tạo dữ liệu giả lập (100 đơn hàng tại khu vực TP.HCM)
+np.random.seed(42)
+data = {
+    'lat': np.random.uniform(10.7, 10.8, 50),
+    'lon': np.random.uniform(106.6, 106.7, 50)
+}
+df = pd.DataFrame(data)
+
+# 2. Áp dụng thuật toán K-Means để phân thành 3 cụm
+n_clusters = 3
+kmeans = KMeans(n_clusters=n_clusters, random_state=42)
+df['cluster'] = kmeans.fit_predict(df[['lat', 'lon']])
+
+# Lấy tọa độ các tâm cụm (vị trí đặt kho hàng tối ưu)
+centers = kmeans.cluster_centers_
+
+# 3. Trực quan hóa trên bản đồ Folium
+# Khởi tạo bản đồ tại trung tâm các điểm dữ liệu
+m = folium.Map(location=[df['lat'].mean(), df['lon'].mean()], zoom_start=13)
+
+# Định nghĩa màu sắc cho các cụm
+colors = ['red', 'blue', 'green']
+
+# Thêm các điểm đơn hàng vào bản đồ
+for _, row in df.iterrows():
+    folium.CircleMarker(
+        location=[row['lat'], row['lon']],
+        radius=3,
+        color=colors[int(row['cluster'])],
+        fill=True,
+        fill_opacity=0.6
+    ).add_to(m)
+
+# Thêm các vị trí đặt kho hàng (Tâm cụm) - Đánh dấu bằng icon ngôi sao
+for i, center in enumerate(centers):
+    folium.Marker(
+        location=[center[0], center[1]],
+        popup=f'Trạm trung chuyển {i+1}',
+        icon=folium.Icon(color='black', icon='star')
+    ).add_to(m)
+
+# Lưu bản đồ thành file html
+m.save('map_clustering.html')
+print("Đã tạo bản đồ 'map_clustering.html'. Hãy mở file này để xem kết quả.")
