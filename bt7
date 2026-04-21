@@ -1,0 +1,29 @@
+!pip install osmnx   # bt7
+import osmnx as ox
+import networkx as nx
+import matplotlib.pyplot as plt
+from geopy.distance import geodesic # Import geodesic for heuristic
+
+place_name="Quan 1, ho chi minh city, Vietnam"
+graph=ox.graph_from_place(place_name, network_type="drive")
+start_latlng=(10.7797,106.6990)# nha tho duc ba
+end_latlng=(10.7719,106.6983)# cho ben thanh
+
+orig_node=ox.distance.nearest_nodes(graph,start_latlng[1], start_latlng[0])
+dest_node=ox.distance.nearest_nodes(graph,end_latlng[1], end_latlng[0])
+# tim duong di bang Dejkstra
+route_dijkstra=nx.shortest_path(graph,orig_node,dest_node,weight="length", method='dijkstra')
+# tim duong bang A*
+def heuristic(u,v):
+  u_coords=(graph.nodes[u]['y'],graph.nodes[u]['x'])
+  v_coords = (graph.nodes[v]['y'],graph.nodes[v]['x'])
+  return geodesic(u_coords, v_coords).meters # Use geodesic distance in meters for heuristic
+
+route_astar = nx.astar_path(graph, orig_node, dest_node, heuristic=heuristic, weight='length')
+
+# 5. Trực quan hóa kết quả
+fig, ax = ox.plot_graph_route(graph, route_astar, route_color='r', route_linewidth=4, node_size=0)
+
+# So sánh độ dài quãng đường
+len_dijkstra = nx.shortest_path_length(graph, orig_node, dest_node, weight='length')
+print(f"Quãng đường ngắn nhất (Dijkstra/A*): {len_dijkstra:.2f} met)")
