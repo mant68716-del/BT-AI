@@ -1,0 +1,26 @@
+import folium #bt5
+
+center_coords = [10.7769, 106.7009]
+
+
+m = folium.Map(location=center_coords, zoom_start=12)
+
+
+folium.Marker(center_coords, popup="Trung tâm phân phối", icon=folium.Icon(color='red')).add_to(m)
+
+
+distances = [3000, 5000, 10000] # đơn vị: mét
+colors = ['green', 'orange', 'red']
+labels = ['Vùng 3km', 'Vùng 5km', 'Vùng 10km']
+
+for dist, color, label in zip(distances, colors, labels):
+    folium.Circle(
+        location=center_coords,
+        radius=dist,
+        color=color,
+        fill=True,
+        fill_opacity=0.2,
+        tooltip=label
+    ).add_to(m)
+
+m
