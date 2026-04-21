@@ -1,0 +1,27 @@
+import numpy as np #bt15
+import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
+
+np.random.seed(42)
+data_q1 = np.random.normal(loc=[10.77, 106.69], scale=[0.01, 0.01], size=(100, 2))
+data_q3 = np.random.normal(loc=[10.78, 106.67], scale=[0.01, 0.01], size=(80, 2))
+X = np.vstack((data_q1, data_q3))
+
+kmeans = KMeans(n_clusters=3, random_state=0)
+kmeans.fit(X)
+centers = kmeans.cluster_centers_
+
+plt.figure(figsize=(8, 6))
+plt.scatter(X[:, 1], X[:, 0], c=kmeans.labels_, cmap='viridis', alpha=0.5, label='Vị trí khách đặt')
+plt.scatter(centers[:, 1], centers[:, 0], c='red', marker='X', s=200, label='Điểm gợi ý chờ khách')
+plt.title("Phân tích điểm nóng để tối ưu hóa việc tìm khách")
+plt.xlabel("Kinh độ")
+plt.ylabel("Vĩ độ")
+plt.legend()
+plt.grid(True)
+plt.show()
+
+# In ra tọa độ gợi ý cho tài xế
+print("--- TỌA ĐỘ GỢI Ý CHO TÀI XẾ ---")
+for i, center in enumerate(centers):
+    print(f"Điểm nóng {i+1}: Vĩ độ {center[0]:.4f}, Kinh độ {center[1]:.4f}")
