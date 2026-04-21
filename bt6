@@ -1,0 +1,18 @@
+!pip install osmnx   # bt6
+import osmnx as ox
+import matplotlib.pyplot as plt
+#tai du lieu mang luoi
+place_name="tan binh, ho chi minh city"
+graph= ox.graph_from_place(place_name, network_type="drive")
+#phan tich va tinh toan
+stats=ox.basic_stats(graph)
+print(f"--- Kết quả phân tích cho khu vực: {place_name} ---")
+print(f"Số lượng nút giao (intersections): {stats['n']}")
+print(f"Số lượng cạnh/đoạn đường (edges): {stats['m']}")
+print(f"Tổng chiều dài đường bộ: {stats['edge_length_total'] / 1000:.2f} km")
+print(f"Chiều dài trung bình một đoạn đường: {stats['street_length_avg']:.2f} m")
+# print(f"Mật độ mạng lưới (tổng chiều dài/diện tích): {stats['street_density_km']: .2f} m/km²") # Dòng này gây lỗi vì khóa không tồn tại
+
+
+fig,ax= ox.plot_graph(graph, node_size=5,node_color="red",edge_color="blue")
+plt.show()
